@@ -1,0 +1,17 @@
+services:
+  database:
+    image: 'postgres:latest'
+    env_file: ../.env
+    networks:
+      - postgres-net 
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+
+volumes:
+  pgdata: 
+    driver: local
+
+networks: 
+  postgres-net:
+    driver: bridge

@@ -1,0 +1,47 @@
+services:
+  loki:
+    image: grafana/loki
+    command: -config.file=/etc/loki/config.yml
+    volumes:
+      - ./loki-config.yml:/etc/loki/config.yml
+      - loki_data:/loki
+    restart: unless-stopped
+    networks:
+      - internal-net
+
+  promtail:
+    image: grafana/promtail
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./promtail-config.yml:/etc/promtail/config.yml
+    command: -config.file=/etc/promtail/config.yml
+    restart: unless-stopped
+    networks:
+      - internal-net
+    depends_on:
+      - loki
+
+  grafana:
+    image: grafana/grafana-oss
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    restart: unless-stopped
+    networks:
+      - internal-net
+    depends_on:
+      - loki
+
+networks:
+  internal-net:
+    driver: bridge
+
+volumes:
+  loki_data:
+    driver: local
+  grafana_data:
+    driver: local

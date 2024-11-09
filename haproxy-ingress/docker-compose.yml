@@ -1,0 +1,13 @@
+services:
+  haproxy:
+    image: haproxy:latest
+    ports:
+      - "80:8000"
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+    networks:
+      - app-backend_app-net
+
+networks:
+  app-backend_app-net:
+    external: true
